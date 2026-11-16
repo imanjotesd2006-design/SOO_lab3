@@ -1,0 +1,8 @@
+# Build-output van IntelliJ
+out/
+
+# Restbestanden van een zip op Mac
+__MACOSX/
+
+# Persoonlijke IntelliJ-instellingen
+.idea/workspace.xml
