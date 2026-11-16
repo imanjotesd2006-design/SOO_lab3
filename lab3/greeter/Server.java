@@ -1,30 +1,37 @@
 package greeter;
-import java.net.*;  // bevat DatagramSocket, DatagramPacket en SocketException
-import java.io.*; // bevat IOException, deze fout kan optreden bij versturen en ontvangen
+
+import java.net.*;
+import java.io.*; // bevat IOException
 
 public class Server {
-	 public static void main(String[] args) {
-	      DatagramSocket socket=null; // declareer de socket = stopcontact, we zetten hem eerst op null en buiten try zodat hij nog bruikbaar is bij finally om af te ronden
-	      int serverPort=1234; // poort ligt vast, hier wordt geluisterd door de server
-	      int bufferSize=100; // maximale grootte van een binnenkomend pakket
-	      
-	      try {
-	    	  socket=new DatagramSocket(serverPort); // maakt socket en verbindt hem met poort 1234, dit is nu het adres van de server, als er als een server is op de poort SocketException
-	    	  while(true) { // oneindige lus
-	    		  byte[] buffer=new byte[bufferSize]; // we maken een lege byte "buffer" aan om de data in op te vangen
-	    		  DatagramPacket request=new DatagramPacket(buffer,buffer.length); // leeg pakket = ontvangstbak, kent buffer en de lengte van de buffer
-	    		  socket.receive(request); // programma blokkeert hier tot er een pakket binnenkomt, daarna: gegevens, ip afzender, poort afzender
-	    		  String rMess="Hello, "+ (new String(request.getData())); // maakt string, zet ook lege bytes om!
-	    		  DatagramPacket reply =new DatagramPacket(rMess.getBytes(),rMess.length(),request.getAddress(),request.getPort()); //maakt antwoordpakket: terug omzetten naar bytes, lengte van het aantal te versturen bytes, ip adres van client van wie het bericht komt, poort van client
-	    		  socket.send(reply); // verstuurt antwoord
-	    	  }
-	      } catch(SocketException e) { //probleem bij maken van de socket
-	    	  System.err.println(e);
-	      } catch(IOException e) { //probleem bij het versturen/ontvangen
-	    	  System.err.println(e);
-	      } finally { // dit wordt ALTIJD uitgevoerd (ook bij fout), sluit socket zodat poort terug vrij komt
-	    	  if(socket!=null) socket.close();
-	      }
-	   }
+	public static void main(String[] args) {
+		int serverPort = 1024;
+		int bufferSize = 100; // maximale grootte van een binnenkomend pakket
+		ServerSocket listen = null; //buiten try + null zodat finally ermee kan werken
+		try {
+			listen = new ServerSocket(serverPort);
+			while (true) {
+				Socket client = listen.accept(); // wacht tot client verbindt
+				BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream())); //bytes -> tekst voor de input
+				PrintWriter out = new PrintWriter(new OutputStreamWriter(client.getOutputStream()), true); //tekst -> bytes voor de output
+				String name = in.readLine();
+				while (name != null && !name.equals("stop")) {
+					out.println("Hello, " + name);
+					name = in.readLine();
+				}
+				client.close();
+			}
+		} catch (SocketException e) { //probleem bij maken van de socket
+			System.err.println(e);
+		} catch (IOException e) { //probleem bij het versturen/ontvangen
+			System.err.println(e);
+		} finally { // dit wordt ALTIJD uitgevoerd (ook bij fout), sluit socket zodat poort terug vrij komt
+			try {
+				if (listen != null) listen.close();
+			} catch (IOException e) {
+				System.err.println(e);
+			}
+		}
 
+	}
 }
