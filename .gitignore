@@ -6,3 +6,6 @@ __MACOSX/
 
 # Persoonlijke IntelliJ-instellingen
 .idea/workspace.xml
+
+# Build-output van Maven
+target/
