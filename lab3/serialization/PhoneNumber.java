@@ -1,7 +1,7 @@
 package serialization;
 import java.io.*;
 
-public class PhoneNumber {
+public class PhoneNumber implements Serializable { // ook Serializable: een Person bevat een PhoneNumber, en dat wordt mee verstuurd
 	private String countryCode,areaCode,number;
 	public PhoneNumber(String countryCode,String areaCode,String number){
 		this.countryCode=countryCode;
